@@ -1,11 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react'; // Added useCallback
 import { Upload, Download, Scissors, Eye } from 'lucide-react';
+import ImageCropper from './ImageCropper'; // Import ImageCropper
 
 export default function App() {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(null); // Original uploaded image object
+  const [imageSrc, setImageSrc] = useState(null); // Data URL of the original image
+  const [croppedImageSrc, setCroppedImageSrc] = useState(null); // Data URL of the cropped image
+  const [croppedImageBlob, setCroppedImageBlob] = useState(null); // Blob of the cropped image
   const [splitImages, setSplitImages] = useState([]);
   const [processing, setProcessing] = useState(false);
-  const [cropPosition, setCropPosition] = useState('center');
+  // Removed cropPosition state
   const fileInputRef = useRef(null);
 
   const handleImageUpload = (e) => {
@@ -16,6 +20,9 @@ export default function App() {
         const img = new window.Image();
         img.onload = () => {
           setImage(img);
+          setImageSrc(event.target.result); // Store the data URL of the original image
+          setCroppedImageSrc(null); // Reset cropped image on new upload
+          setCroppedImageBlob(null); // Reset cropped image blob on new upload
           setSplitImages([]);
         };
         img.src = event.target.result;
@@ -24,125 +31,128 @@ export default function App() {
     }
   };
 
-  const splitImage = () => {
-    if (!image) return;
-    
+  const splitImage = useCallback(() => {
+    if (!croppedImageBlob) return;
+
     setProcessing(true);
-    setTimeout(() => {
-      const results = [];
-      
-      const totalWidth = image.width;
-      const pieceWidth = totalWidth / 3;
-      const margin = pieceWidth * 0.015;
-      
-      for (let i = 0; i < 3; i++) {
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        let startX = i * pieceWidth;
-        let width = pieceWidth;
-        
-        if (i === 0) {
-          width = pieceWidth + margin;
-        } else if (i === 2) {
-          startX = i * pieceWidth - margin;
-          width = pieceWidth + margin;
-        } else {
-          startX = i * pieceWidth - margin;
-          width = pieceWidth + (margin * 2);
-        }
-        
-        tempCanvas.width = width;
-        tempCanvas.height = image.height;
-        
-        tempCtx.drawImage(
-          image,
-          startX, 0, width, image.height,
-          0, 0, width, image.height
-        );
-        
-        const ratio34Canvas = document.createElement('canvas');
-        const ratio34Ctx = ratio34Canvas.getContext('2d');
-        ratio34Canvas.width = 1080;
-        ratio34Canvas.height = 1440;
-        
-        const pieceRatio = width / image.height;
-        const targetRatio = 0.75;
-        
-        let sourceX = 0, sourceY = 0, sourceW = width, sourceH = image.height;
-        
-        if (pieceRatio > targetRatio) {
-          sourceW = image.height * targetRatio;
-          if (cropPosition === 'left') {
-            sourceX = 0;
-          } else if (cropPosition === 'right') {
-            sourceX = width - sourceW;
+    // Use a Promise to load the cropped image blob into an Image object
+    const loadImage = (blob) => {
+      return new Promise((resolve, reject) => {
+        const img = new window.Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = URL.createObjectURL(blob);
+      });
+    };
+
+    loadImage(croppedImageBlob)
+      .then((loadedImage) => {
+        const results = [];
+        const totalWidth = loadedImage.width; // Use loadedImage width
+        const pieceWidth = totalWidth / 3;
+        const margin = pieceWidth * 0.015;
+
+        for (let i = 0; i < 3; i++) {
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+
+          let startX = i * pieceWidth;
+          let width = pieceWidth;
+
+          if (i === 0) {
+            width = pieceWidth + margin;
+          } else if (i === 2) {
+            startX = i * pieceWidth - margin;
+            width = pieceWidth + margin;
           } else {
-            sourceX = (width - sourceW) / 2;
+            startX = i * pieceWidth - margin;
+            width = pieceWidth + (margin * 2);
           }
-        } else {
-          sourceH = width / targetRatio;
-          if (cropPosition === 'top') {
-            sourceY = 0;
-          } else if (cropPosition === 'bottom') {
-            sourceY = image.height - sourceH;
+
+          tempCanvas.width = width;
+          tempCanvas.height = loadedImage.height; // Use loadedImage height
+
+          tempCtx.drawImage(
+            loadedImage, // Draw the loaded cropped image
+            startX, 0, width, loadedImage.height,
+            0, 0, width, loadedImage.height
+          );
+
+          const ratio34Canvas = document.createElement('canvas');
+          const ratio34Ctx = ratio34Canvas.getContext('2d');
+          ratio34Canvas.width = 1080;
+          ratio34Canvas.height = 1440;
+
+          const pieceRatio = width / loadedImage.height; // Use loadedImage height
+          const targetRatio = 0.75;
+
+          let sourceX = 0, sourceY = 0, sourceW = width, sourceH = loadedImage.height; // Use loadedImage height
+
+          if (pieceRatio > targetRatio) {
+            sourceW = loadedImage.height * targetRatio;
+            sourceX = (width - sourceW) / 2; // Always center crop since user cropped previously
           } else {
-            sourceY = (image.height - sourceH) / 2;
+            sourceH = width / targetRatio;
+            sourceY = (loadedImage.height - sourceH) / 2; // Always center crop
           }
+
+          ratio34Ctx.drawImage(
+            tempCanvas,
+            sourceX, sourceY, sourceW, sourceH,
+            0, 0, 1080, 1440
+          );
+
+          const finalCanvas = document.createElement('canvas');
+          const finalCtx = finalCanvas.getContext('2d');
+          finalCanvas.width = 1080;
+          finalCanvas.height = 1350;
+
+          const yOffset = (1350 - 1440) / 2;
+
+          const topData = ratio34Ctx.getImageData(540, 0, 10, 1);
+          const bottomData = ratio34Ctx.getImageData(540, 1439, 10, 1);
+
+          const getAvgColor = (data) => {
+            let r = 0, g = 0, b = 0;
+            for (let i = 0; i < data.data.length; i += 4) {
+              r += data.data[i];
+              g += data.data[i + 1];
+              b += data.data[i + 2];
+            }
+            const count = data.data.length / 4;
+            return `rgb(${Math.round(r / count)}, ${Math.round(g / count)}, ${Math.round(b / count)})`;
+          };
+
+          const topGrad = finalCtx.createLinearGradient(0, 0, 0, Math.abs(yOffset));
+          topGrad.addColorStop(0, getAvgColor(topData).replace('rgb', 'rgba').replace(')', ', 0.7)'));
+          topGrad.addColorStop(1, getAvgColor(topData));
+          finalCtx.fillStyle = topGrad;
+          finalCtx.fillRect(0, 0, 1080, Math.abs(yOffset));
+
+          finalCtx.drawImage(ratio34Canvas, 0, Math.abs(yOffset));
+
+          const bottomY = Math.abs(yOffset) + 1440;
+          const bottomGrad = finalCtx.createLinearGradient(0, bottomY, 0, 1350);
+          bottomGrad.addColorStop(0, getAvgColor(bottomData));
+          bottomGrad.addColorStop(1, getAvgColor(bottomData).replace('rgb', 'rgba').replace(')', ', 0.7)'));
+          finalCtx.fillStyle = bottomGrad;
+          finalCtx.fillRect(0, bottomY, 1080, 1350 - bottomY);
+
+          results.push({
+            dataUrl: finalCanvas.toDataURL('image/jpeg', 0.95),
+            index: i
+          });
         }
-        
-        ratio34Ctx.drawImage(
-          tempCanvas,
-          sourceX, sourceY, sourceW, sourceH,
-          0, 0, 1080, 1440
-        );
-        
-        const finalCanvas = document.createElement('canvas');
-        const finalCtx = finalCanvas.getContext('2d');
-        finalCanvas.width = 1080;
-        finalCanvas.height = 1350;
-        
-        const yOffset = (1350 - 1440) / 2;
-        
-        const topData = ratio34Ctx.getImageData(540, 0, 10, 1);
-        const bottomData = ratio34Ctx.getImageData(540, 1439, 10, 1);
-        
-        const getAvgColor = (data) => {
-          let r = 0, g = 0, b = 0;
-          for (let i = 0; i < data.data.length; i += 4) {
-            r += data.data[i];
-            g += data.data[i + 1];
-            b += data.data[i + 2];
-          }
-          const count = data.data.length / 4;
-          return `rgb(${Math.round(r/count)}, ${Math.round(g/count)}, ${Math.round(b/count)})`;
-        };
-        
-        const topGrad = finalCtx.createLinearGradient(0, 0, 0, Math.abs(yOffset));
-        topGrad.addColorStop(0, getAvgColor(topData).replace('rgb', 'rgba').replace(')', ', 0.7)'));
-        topGrad.addColorStop(1, getAvgColor(topData));
-        finalCtx.fillStyle = topGrad;
-        finalCtx.fillRect(0, 0, 1080, Math.abs(yOffset));
-        
-        finalCtx.drawImage(ratio34Canvas, 0, Math.abs(yOffset));
-        
-        const bottomY = Math.abs(yOffset) + 1440;
-        const bottomGrad = finalCtx.createLinearGradient(0, bottomY, 0, 1350);
-        bottomGrad.addColorStop(0, getAvgColor(bottomData));
-        bottomGrad.addColorStop(1, getAvgColor(bottomData).replace('rgb', 'rgba').replace(')', ', 0.7)'));
-        finalCtx.fillStyle = bottomGrad;
-        finalCtx.fillRect(0, bottomY, 1080, 1350 - bottomY);
-        
-        results.push({
-          dataUrl: finalCanvas.toDataURL('image/jpeg', 0.95),
-          index: i
-        });
-      }
-      
-      setSplitImages(results);
-      setProcessing(false);
-    }, 100);
-  };
+
+        setSplitImages(results);
+        setProcessing(false);
+      })
+      .catch(error => {
+        console.error('Error loading cropped image:', error);
+        setProcessing(false);
+      });
+  }, [croppedImageBlob]); // Dependency on croppedImageBlob
+
 
   const downloadImage = (dataUrl, index) => {
     const link = document.createElement('a');
@@ -190,79 +200,28 @@ export default function App() {
             이미지 업로드
           </button>
 
-          {image && (
-            <>
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  자르기 기준점
-                </label>
-                <div className="grid grid-cols-3 gap-2 mb-2">
-                  <button
-                    onClick={() => setCropPosition('top')}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                      cropPosition === 'top'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    상단 우선
-                  </button>
-                  <button
-                    onClick={() => setCropPosition('center')}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                      cropPosition === 'center'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    중앙
-                  </button>
-                  <button
-                    onClick={() => setCropPosition('bottom')}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                      cropPosition === 'bottom'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    하단 우선
-                  </button>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    onClick={() => setCropPosition('left')}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                      cropPosition === 'left'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    좌측 우선
-                  </button>
-                  <div></div>
-                  <button
-                    onClick={() => setCropPosition('right')}
-                    className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                      cropPosition === 'right'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    우측 우선
-                  </button>
-                </div>
-              </div>
+          {imageSrc && !croppedImageSrc && (
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">이미지 자르기</h2>
+              <ImageCropper
+                imageSrc={imageSrc}
+                onCropComplete={(dataUrl, blob) => {
+                  setCroppedImageSrc(dataUrl);
+                  setCroppedImageBlob(blob);
+                }}
+              />
+            </div>
+          )}
 
+          {croppedImageSrc && (
+            <>
               <div className="mb-6 text-center">
                 <img
-                  src={image.src}
-                  alt="Original"
+                  src={croppedImageSrc}
+                  alt="Cropped"
                   className="max-w-full h-auto mx-auto rounded-lg shadow-md"
                   style={{ maxHeight: '400px' }}
                 />
-                <p className="text-sm text-gray-500 mt-2">
-                  {image.width} × {image.height}px
-                </p>
               </div>
 
               <button
