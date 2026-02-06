@@ -25,15 +25,17 @@ npm run build
 
 ## 📦 배포
 
-### Cloudflare Pages
-1. GitHub 저장소 연결
-2. Build command: `npm run build`
-3. Build output: `dist`
+### Cloudflare Pages (GitHub 연동)
+1. [Cloudflare Pages](https://pages.cloudflare.com/) 접속
+2. "Create a project" → "Connect to Git"
+3. GitHub 저장소 선택: `haileysunn/insta-grid`
+4. **Build settings:**
+   - Framework preset: **Vite**
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+5. "Save and Deploy"
 
-### Vercel
-1. GitHub 저장소 연결
-2. Framework Preset: Vite
-3. 자동 배포!
+이후 GitHub에 푸시할 때마다 자동 배포됩니다! 🎉
 
 ## 🛠️ 기술 스택
 
@@ -53,3 +55,23 @@ npm run build
 ## 📄 라이선스
 
 MIT
+
+---
+
+## 💡 프로젝트 배경
+
+이 프로젝트는 **Claude Sonnet 4 LLM**과의 대화형 코딩으로 약 20분 만에 완성되었습니다.
+
+### 개발 워크플로우
+1. 🤖 **Claude Sonnet 4** - AI 기반 코드 생성
+2. 💻 **Firebase Studio** - 개발 환경 및 디버깅
+3. 📦 **GitHub** - 소스 코드 버전 관리
+4. 🚀 **Cloudflare Pages** - 자동 배포
+
+### AI 협업 과정
+- 💬 요구사항 설명 → 즉시 코드 생성
+- 🔄 피드백 → 실시간 수정 및 디버깅
+- 🎨 UI/UX 개선 → 반복 작업
+- 🐛 오류 해결 → 즉각적인 수정
+
+AI와 함께하는 새로운 개발 방식! 🚀
