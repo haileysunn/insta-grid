@@ -79,6 +79,10 @@ MIT License - 자유롭게 사용하세요!
 - GitHub: [@haileysunn](https://github.com/haileysunn)
 - Email: haileysunn.o3o@gmail.com
 
+## 🎨 크레딧
+
+- **로고 & 파비콘 디자인**: DDN (Gemini AI 활용)
+
 ## 🙏 감사의 말
 
 이 프로젝트는 [Amazon Q Developer](https://aws.amazon.com/q/)의 Vibe Coding 기능을 활용하여 개발되었습니다.
