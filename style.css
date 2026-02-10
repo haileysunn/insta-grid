@@ -1,0 +1,313 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f0f0f;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(72, 219, 251, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(253, 203, 110, 0.15) 0%, transparent 50%);
+    animation: gradientShift 15s ease infinite;
+    z-index: 0;
+}
+
+@keyframes gradientShift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-10%, -10%); }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 50px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.logo-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+    display: block;
+}
+
+h1 {
+    text-align: center;
+    background: linear-gradient(135deg, #ff6b6b 0%, #48dbfb 50%, #fdcb6e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95em;
+    margin-bottom: 40px;
+}
+
+h2 {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+#uploadSection {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+#imageInput {
+    display: none;
+}
+
+.upload-btn {
+    display: inline-block;
+    padding: 18px 50px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+}
+
+.editor-container {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.canvas-wrapper {
+    position: relative;
+    display: inline-block;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+#cropCanvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+}
+
+.grid-line {
+    flex: 1;
+    border-right: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.grid-line:last-child {
+    border-right: none;
+}
+
+.controls {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.controls p {
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    line-height: 1.6;
+    font-size: 0.95em;
+}
+
+.process-btn, .reset-btn {
+    padding: 16px 35px;
+    background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(72, 219, 251, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.process-btn:hover, .reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(72, 219, 251, 0.4);
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.result-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.result-item canvas {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.result-item button {
+    padding: 12px 28px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.result-item button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.download-all-btn {
+    background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%) !important;
+    box-shadow: 0 10px 30px rgba(253, 203, 110, 0.3) !important;
+}
+
+.download-all-btn:hover {
+    box-shadow: 0 15px 40px rgba(253, 203, 110, 0.4) !important;
+}
+
+.ad-container {
+    margin: 30px 0;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.ad-top {
+    margin-bottom: 40px;
+}
+
+.ad-middle {
+    margin: 40px 0;
+}
+
+.ad-bottom {
+    margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 20px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .logo-icon {
+        font-size: 2.5em;
+    }
+    
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .editor-container {
+        flex-direction: column;
+    }
+    
+    .controls {
+        min-width: 100%;
+    }
+    
+    #uploadSection {
+        padding: 60px 20px;
+    }
+}

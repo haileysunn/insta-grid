@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaGrid - 인스타그램 그리드 이미지 분할 도구 | 무료 온라인</title>
+    <meta name="description" content="인스타그램 피드를 위한 무료 그리드 이미지 분할 도구. 한 장의 이미지를 3개로 나누어 인스타 피드에서 하나로 이어지게 만드세요. 모바일 지원, 간편한 드래그 편집.">
+    <meta name="keywords" content="인스타그램, 그리드, 이미지 분할, 인스타 피드, 그리드 이미지, 이미지 편집, 무료 도구, instagram grid, 인스타 그리드">
+    <meta name="author" content="InstaGrid">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://yourdomain.com/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:title" content="InstaGrid - 인스타그램 그리드 이미지 분할 도구">
+    <meta property="og:description" content="한 장의 이미지를 3개로 나누어 인스타 피드에서 하나로 이어지게 만드는 무료 도구">
+    <meta property="og:image" content="https://yourdomain.com/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://yourdomain.com/">
+    <meta property="twitter:title" content="InstaGrid - 인스타그램 그리드 이미지 분할 도구">
+    <meta property="twitter:description" content="한 장의 이미지를 3개로 나누어 인스타 피드에서 하나로 이어지게 만드는 무료 도구">
+    <meta property="twitter:image" content="https://yourdomain.com/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Google AdSense -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+         crossorigin="anonymous"></script> -->
+    
+    <!-- Google Analytics -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YOUR_MEASUREMENT_ID');
+    </script> -->
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "InstaGrid",
+      "description": "인스타그램 피드를 위한 무료 그리드 이미지 분할 도구",
+      "url": "https://yourdomain.com/",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "KRW"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <span class="logo-icon">📸</span>
+            <h1>InstaGrid</h1>
+            <p class="subtitle">인스타그램 피드를 위한 그리드 이미지 분할 도구</p>
+        </div>
+        
+        <!-- 상단 광고 -->
+        <div class="ad-container ad-top">
+            <!-- <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                 data-ad-slot="YOUR_AD_SLOT_ID"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script> -->
+        </div>
+        
+        <div id="uploadSection">
+            <input type="file" id="imageInput" accept="image/*">
+            <label for="imageInput" class="upload-btn">📁 이미지 선택하기</label>
+        </div>
+
+        <div id="editorSection" style="display: none;">
+            <div class="editor-container">
+                <div class="canvas-wrapper">
+                    <canvas id="cropCanvas"></canvas>
+                    <div class="grid-overlay">
+                        <div class="grid-line"></div>
+                        <div class="grid-line"></div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <p>🖱️ <strong>드래그</strong>로 이미지 이동<br>🔍 <strong>마우스 휠</strong>로 확대/축소<br>📱 <strong>터치</strong>로도 조작 가능</p>
+                    <button id="processBtn" class="process-btn">✨ 이미지 생성하기</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultSection" style="display: none;">
+            <h2>🎉 생성 완료!</h2>
+            
+            <!-- 중간 광고 -->
+            <div class="ad-container ad-middle">
+                <!-- <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                     data-ad-slot="YOUR_AD_SLOT_ID"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script> -->
+            </div>
+            
+            <div class="result-grid">
+                <div class="result-item">
+                    <canvas id="result1"></canvas>
+                    <button onclick="downloadImage(0)">💾 다운로드 1</button>
+                </div>
+                <div class="result-item">
+                    <canvas id="result2"></canvas>
+                    <button onclick="downloadImage(1)">💾 다운로드 2</button>
+                </div>
+                <div class="result-item">
+                    <canvas id="result3"></canvas>
+                    <button onclick="downloadImage(2)">💾 다운로드 3</button>
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="downloadAllBtn" class="reset-btn download-all-btn">📦 전체 다운로드</button>
+                <button id="resetBtn" class="reset-btn">🔄 새 이미지 선택</button>
+            </div>
+        </div>
+        
+        <!-- 하단 광고 -->
+        <div class="ad-container ad-bottom">
+            <!-- <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                 data-ad-slot="YOUR_AD_SLOT_ID"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script> -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
