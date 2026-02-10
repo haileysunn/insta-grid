@@ -283,31 +283,107 @@ h2 {
 }
 
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
     .container {
-        padding: 30px 20px;
+        padding: 20px 15px;
+        border-radius: 16px;
     }
     
     h1 {
-        font-size: 2em;
+        font-size: 1.8em;
     }
     
     .logo-icon {
         font-size: 2.5em;
     }
     
-    .result-grid {
-        grid-template-columns: 1fr;
+    .subtitle {
+        font-size: 0.9em;
+    }
+    
+    .upload-btn {
+        padding: 16px 40px;
+        font-size: 1em;
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    #uploadSection {
+        padding: 40px 15px;
     }
     
     .editor-container {
         flex-direction: column;
+        gap: 20px;
+    }
+    
+    .canvas-wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    #cropCanvas {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
     }
     
     .controls {
         min-width: 100%;
+        padding: 20px;
     }
     
-    #uploadSection {
-        padding: 60px 20px;
+    .controls p {
+        font-size: 0.9em;
+        line-height: 1.8;
+    }
+    
+    .process-btn, .reset-btn {
+        padding: 14px 30px;
+        font-size: 1em;
+        width: 100%;
+    }
+    
+    .result-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .result-item {
+        padding: 15px;
+    }
+    
+    .result-item button {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 0.95em;
+    }
+    
+    .result-item small {
+        display: block;
+        text-align: center;
+        margin-top: 5px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .button-group button {
+        width: 100%;
+    }
+    
+    h2 {
+        font-size: 1.3em;
+    }
+    
+    .ad-container {
+        margin: 20px 0;
+        min-height: 80px;
+        padding: 15px;
     }
 }

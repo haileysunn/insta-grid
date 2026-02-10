@@ -6,6 +6,7 @@ let offsetY = 0;
 let isDragging = false;
 let lastX = 0;
 let lastY = 0;
+let lastDistance = 0;
 
 const PIECE_WIDTH = 300;
 const PIECE_HEIGHT = 400;
@@ -97,6 +98,28 @@ function dragTouch(e) {
     if (!isDragging) return;
     e.preventDefault();
     
+    if (e.touches.length === 2) {
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const distance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
+        );
+        
+        if (lastDistance > 0) {
+            const delta = distance - lastDistance;
+            const imgAspect = originalImage.width / originalImage.height;
+            const canvasAspect = CANVAS_WIDTH / CANVAS_HEIGHT;
+            const minScale = imgAspect > canvasAspect ? 1 : canvasAspect / imgAspect;
+            
+            scale = Math.max(minScale, Math.min(3, scale + delta * 0.01));
+            updatePreview();
+        }
+        
+        lastDistance = distance;
+        return;
+    }
+    
     const rect = cropCanvas.getBoundingClientRect();
     const touch = e.touches[0];
     const currentX = (touch.clientX - rect.left) * (CANVAS_WIDTH / rect.width);
@@ -139,6 +162,7 @@ function applyDrag(deltaX, deltaY) {
 
 function endDrag() {
     isDragging = false;
+    lastDistance = 0;
     cropCanvas.style.cursor = 'grab';
 }
 
@@ -172,6 +196,8 @@ function updatePreview() {
     const x = (CANVAS_WIDTH - drawWidth) / 2 + offsetX;
     const y = (CANVAS_HEIGHT - drawHeight) / 2 + offsetY;
 
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(originalImage, x, y, drawWidth, drawHeight);
 }
 
@@ -184,10 +210,12 @@ function processImage() {
 
     for (let i = 0; i < 3; i++) {
         const pieceCanvas = document.createElement('canvas');
-        const pieceCtx = pieceCanvas.getContext('2d');
+        const pieceCtx = pieceCanvas.getContext('2d', { alpha: false, willReadFrequently: false });
         pieceCanvas.width = PIECE_WIDTH;
         pieceCanvas.height = PIECE_HEIGHT;
 
+        pieceCtx.imageSmoothingEnabled = true;
+        pieceCtx.imageSmoothingQuality = 'high';
         pieceCtx.drawImage(cropCanvas, PIECE_WIDTH * i, 0, PIECE_WIDTH, PIECE_HEIGHT, 0, 0, PIECE_WIDTH, PIECE_HEIGHT);
 
         const finalCanvas = resultCanvases[i];
@@ -195,14 +223,16 @@ function processImage() {
         const finalHeight = 1350;
         finalCanvas.width = finalWidth;
         finalCanvas.height = finalHeight;
-        const finalCtx = finalCanvas.getContext('2d');
+        const finalCtx = finalCanvas.getContext('2d', { alpha: false, willReadFrequently: false });
 
         const bgCanvas = document.createElement('canvas');
         bgCanvas.width = finalWidth;
         bgCanvas.height = finalHeight;
-        const bgCtx = bgCanvas.getContext('2d');
+        const bgCtx = bgCanvas.getContext('2d', { alpha: false });
 
         bgCtx.filter = 'blur(40px)';
+        bgCtx.imageSmoothingEnabled = true;
+        bgCtx.imageSmoothingQuality = 'high';
         bgCtx.drawImage(pieceCanvas, 0, 0, finalWidth, finalHeight);
         bgCtx.filter = 'none';
 
@@ -212,6 +242,8 @@ function processImage() {
         const scaledHeight = (PIECE_HEIGHT / PIECE_WIDTH) * finalWidth;
         const yPos = (finalHeight - scaledHeight) / 2;
 
+        finalCtx.imageSmoothingEnabled = true;
+        finalCtx.imageSmoothingQuality = 'high';
         finalCtx.drawImage(pieceCanvas, 0, yPos, scaledWidth, scaledHeight);
     }
 
@@ -223,13 +255,17 @@ function downloadImage(index) {
     const canvas = document.getElementById(`result${index + 1}`);
     const link = document.createElement('a');
     link.download = `insta-grid-${index + 1}.jpg`;
-    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    link.href = canvas.toDataURL('image/jpeg', 1.0);
     link.click();
 }
 
 function downloadAll() {
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        alert('모바일에서는 개별 다운로드를 이용해주세요.\n각 이미지를 길게 눌러 저장할 수 있습니다.');
+        return;
+    }
     for (let i = 0; i < 3; i++) {
-        setTimeout(() => downloadImage(i), i * 300);
+        setTimeout(() => downloadImage(i), i * 500);
     }
 }
 
