@@ -481,3 +481,44 @@ h2 {
         padding: 15px;
     }
 }
+
+/* PWA 설치 안내 박스 */
+.info-box {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+.install-detail {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.install-detail summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    transition: color 0.3s ease;
+}
+
+.install-detail summary:hover {
+    color: #48dbfb;
+}
+
+.install-detail ol {
+    margin-top: 10px;
+    padding-left: 20px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.install-detail ol li {
+    margin: 5px 0;
+}
+
+.install-detail ol strong {
+    color: rgba(255, 255, 255, 0.9);
+}
