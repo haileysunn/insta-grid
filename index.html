@@ -40,6 +40,13 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="InstaGrid">
+    
     <link rel="stylesheet" href="style.css">
     
     <!-- Google AdSense -->
@@ -104,6 +111,64 @@
             <p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 20px; font-size: 0.9em;">
                 🔒 모든 처리는 브라우저에서 진행되며, 이미지는 서버에 저장되지 않습니다.
             </p>
+            
+            <!-- PWA 설치 전 광고 -->
+            <div class="ad-container" style="margin-top: 30px;">
+                <!-- <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                     data-ad-slot="YOUR_AD_SLOT_ID"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script> -->
+            </div>
+            
+            <!-- PWA 설치 안내 -->
+            <div class="info-box" style="margin-top: 30px;">
+                <h3 style="text-align: center; margin-bottom: 15px; font-size: 1.1em; color: rgba(255,255,255,0.9);">📱 앱으로 설치하기</h3>
+                <p style="text-align: center; color: rgba(255,255,255,0.6); margin-bottom: 20px; font-size: 0.9em;">
+                    홈 화면에 추가하여 앱처럼 사용하세요!
+                </p>
+                
+                <div class="install-steps" style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Android 안내 -->
+                    <details class="mobile-only install-detail">
+                        <summary>🤖 Android (Chrome)</summary>
+                        <ol>
+                            <li>주소창 옆 <strong>"설치"</strong> 버튼 클릭</li>
+                            <li>"설치" 확인</li>
+                            <li>홈 화면에 아이콘 추가됨 ✨</li>
+                        </ol>
+                    </details>
+                    
+                    <!-- iOS 안내 -->
+                    <details class="mobile-only install-detail">
+                        <summary>🍎 iOS (Safari)</summary>
+                        <ol>
+                            <li>하단 <strong>공유</strong> 버튼 (⬆️) 탭</li>
+                            <li><strong>"홈 화면에 추가"</strong> 선택</li>
+                            <li>"추가" 탭</li>
+                            <li>홈 화면에 아이콘 추가됨 ✨</li>
+                        </ol>
+                    </details>
+                    
+                    <!-- Desktop 안내 -->
+                    <details class="desktop-only install-detail">
+                        <summary>💻 Desktop (Chrome/Edge)</summary>
+                        <ol>
+                            <li>주소창 오른쪽 <strong>설치</strong> 아이콘 클릭</li>
+                            <li>"설치" 확인</li>
+                            <li>독립 앱으로 실행됨 ✨</li>
+                        </ol>
+                    </details>
+                </div>
+                
+                <p style="text-align: center; color: rgba(255,255,255,0.5); margin-top: 15px; font-size: 0.85em;">
+                    💡 오프라인에서도 사용 가능 | 빠른 로딩 | 앱처럼 실행
+                </p>
+            </div>
         </div>
 
         <div id="editorSection" style="display: none;">
@@ -175,5 +240,20 @@
     </div>
 
     <script src="script.js"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker 등록 성공:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('❌ Service Worker 등록 실패:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
